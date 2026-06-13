@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fattesing Rane — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1f2937;
+  --green: #00ff87;
+  --green2: #00c96a;
+  --blue: #58a6ff;
+  --yellow: #f0c040;
+  --red: #ff5f57;
+  --orange: #ff9f0a;
+  --text: #e6edf3;
+  --muted: #7d8590;
+  --border: rgba(255,255,255,0.08);
+  --fm: 'JetBrains Mono', monospace;
+  --ff: 'Space Grotesk', sans-serif;
+}
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  background: #0a0c0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--fm);
+}
+
+/* ── DESKTOP WRAPPER ── */
+.desktop {
+  width: 100vw; height: 100vh;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* matrix canvas sits behind everything */
+#matrix-canvas {
+  position: fixed; inset: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── TASKBAR ── */
+.taskbar {
+  height: 42px;
+  background: rgba(13,17,23,0.75);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  gap: 1rem;
+  flex-shrink: 0;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+}
+.tb-logo {
+  font-size: 0.75rem;
+  color: var(--green);
+  letter-spacing: 0.1em;
+  font-weight: 700;
+}
+.tb-clock {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+
+/* ── DESKTOP ICONS ── */
+.desktop-icons {
+  position: absolute;
+  top: 60px; right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.d-icon {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  width: 70px;
+}
+.d-icon:hover { background: rgba(255,255,255,0.07); }
+.d-icon-img {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+}
+.d-icon-label {
+  font-size: 0.65rem;
+  color: var(--text);
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+/* ── WINDOW BASE ── */
+.window {
+  position: absolute;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  display: none;
+  flex-direction: column;
+  min-width: 340px;
+  min-height: 200px;
+}
+.window.open { display: flex; }
+
+.win-titlebar {
+  height: 38px;
+  background: #1c2128;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  gap: 0.5rem;
+  cursor: move;
+  flex-shrink: 0;
+  user-select: none;
+}
+.win-btn {
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.win-close { background: var(--red); }
+.win-min { background: var(--orange); }
+.win-max { background: var(--green2); }
+.win-title {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-left: 0.5rem;
+  flex: 1;
+  text-align: center;
+}
+
+/* ── TERMINAL WINDOW ── */
+#terminal-win {
+  width: min(960px, 95vw);
+  height: min(600px, 85vh);
+  top: 56px; left: 50%;
+  transform: translateX(-50%);
+}
+
+/* inner split */
+.term-split {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* LEFT: output pane */
+.term-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #080b0f;
+  min-width: 0;
+}
+
+/* scanline shimmer on output */
+.term-pane::after {
+  content: '';
+  position: absolute;
+  inset: 38px 240px 0 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,255,135,0.012) 3px,
+    rgba(0,255,135,0.012) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.term-body {
+  flex: 1;
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--text);
+  position: relative;
+  z-index: 2;
+}
+.term-line { white-space: pre-wrap; word-break: break-word; margin-bottom: 1px; }
+.term-line.cmd-echo {
+  display: flex; align-items: baseline; gap: 0.5rem;
+}
+.term-line.cmd-echo .echo-prompt { color: var(--green2); flex-shrink: 0; font-size: 0.75rem; }
+.term-line.cmd-echo .echo-cmd { color: #c9d1d9; }
+.term-line.out { color: #8b949e; }
+.term-line.out-green { color: var(--green); }
+.term-line.out-blue { color: var(--blue); }
+.term-line.out-yellow { color: var(--yellow); }
+.term-line.out-red { color: #ff5f57; }
+.term-line.ascii { color: var(--green2); font-size: 0.6rem; line-height: 1.25; letter-spacing: 0.02em; }
+.term-line.blank { height: 6px; }
+
+/* input bar */
+.term-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.25rem;
+  background: #0d1117;
+  border-top: 1px solid rgba(0,255,135,0.12);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+.term-prompt-wrap {
+  display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+}
+.term-prompt-user { color: var(--green); font-size: 0.78rem; font-weight: 700; }
+.term-prompt-sep  { color: #3a4450; font-size: 0.78rem; }
+.term-prompt-dir  { color: var(--blue); font-size: 0.78rem; }
+.term-prompt-dollar { color: var(--green2); font-size: 0.78rem; margin-left: 2px; }
+.term-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e6edf3;
+  font-family: var(--fm);
+  font-size: 0.8rem;
+  caret-color: var(--green);
+  letter-spacing: 0.02em;
+}
+.term-input::placeholder { color: #3a4450; }
+
+/* autocomplete hint */
+.term-hint {
+  font-size: 0.72rem;
+  color: #3a4450;
+  font-family: var(--fm);
+  flex-shrink: 0;
+  padding-right: 0.25rem;
+  pointer-events: none;
+}
+
+/* RIGHT: command palette */
+.term-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: #0d1117;
+  border-left: 1px solid rgba(0,255,135,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.tsb-header {
+  padding: 0.75rem 1rem 0.6rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}
+.tsb-title {
+  font-size: 0.62rem;
+  color: var(--green2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-family: var(--fm);
+}
+.tsb-sub {
+  font-size: 0.6rem;
+  color: #3a4450;
+  margin-top: 2px;
+  font-family: var(--fm);
+}
+.tsb-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.6rem 0.75rem;
+}
+.tsb-group { margin-bottom: 1rem; }
+.tsb-group-label {
+  font-size: 0.58rem;
+  color: #3a4450;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-family: var(--fm);
+  margin-bottom: 0.45rem;
+  padding-left: 2px;
+}
+.cmd-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+  padding: 0.45rem 0.6rem;
+  margin-bottom: 0.35rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+}
+.cmd-chip:hover {
+  background: rgba(0,255,135,0.07);
+  border-color: rgba(0,255,135,0.25);
+}
+.cmd-chip:active { transform: scale(0.98); }
+.chip-icon {
+  font-size: 0.78rem;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+.chip-text { flex: 1; min-width: 0; }
+.chip-name {
+  font-size: 0.74rem;
+  color: #c9d1d9;
+  font-family: var(--fm);
+  display: block;
+  line-height: 1.3;
+}
+.chip-desc {
+  font-size: 0.62rem;
+  color: #3a4450;
+  font-family: var(--ff);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmd-chip:hover .chip-name { color: var(--green); }
+.cmd-chip:hover .chip-desc { color: #7d8590; }
+
+/* active chip highlight */
+.cmd-chip.active {
+  background: rgba(0,255,135,0.1);
+  border-color: rgba(0,255,135,0.35);
+}
+.cmd-chip.active .chip-name { color: var(--green); }
+
+/* keyboard shortcut badge */
+.chip-kbd {
+  font-size: 0.58rem;
+  color: #3a4450;
+  font-family: var(--fm);
+  flex-shrink: 0;
+}
+
+/* ── ABOUT WINDOW ── */
+#about-win {
+  width: min(600px, 90vw);
+  height: min(460px, 75vh);
+  top: 80px; left: calc(50% - 200px);
+}
+.about-body {
+  flex: 1; overflow-y: auto;
+  padding: 1.5rem;
+  font-family: var(--ff);
+  font-size: 0.92rem;
+  color: var(--text);
+  line-height: 1.75;
+  background: var(--bg2);
+}
+.about-avatar {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(0,255,135,0.12);
+  border: 2px solid var(--green2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+}
+.about-name { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
+.about-sub { font-size: 0.85rem; color: var(--green); margin-bottom: 1rem; }
+.about-p { color: #8b949e; font-size: 0.88rem; margin-bottom: 0.75rem; line-height: 1.7; }
+.info-row { display: flex; gap: 0.5rem; align-items: center; font-size: 0.82rem; color: var(--muted); margin-bottom: 0.4rem; }
+.info-row span:first-child { color: var(--green); width: 90px; flex-shrink: 0; }
+
+/* ── SKILLS WINDOW ── */
+#skills-win {
+  width: min(620px, 90vw);
+  height: min(480px, 76vh);
+  top: 100px; left: calc(50% - 120px);
+}
+.skills-body {
+  flex: 1; overflow-y: auto;
+  padding: 1.25rem;
+  background: var(--bg2);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  align-content: start;
+}
+.sk-card {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+}
+.sk-title { font-size: 0.7rem; color: var(--green); letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--fm); margin-bottom: 0.6rem; }
+.sk-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.sk-tag {
+  font-size: 0.72rem; font-family: var(--fm);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: #8b949e;
+  padding: 0.2rem 0.55rem;
+  border-radius: 3px;
+}
+.sk-bar-row { margin-top: 0.5rem; }
+.sk-bar-label { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); margin-bottom: 3px; }
+.sk-bar-track { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+.sk-bar-fill { height: 100%; background: var(--green2); border-radius: 2px; transition: width 0.8s ease; }
+
+/* ── EXPERIENCE WINDOW ── */
+#exp-win {
+  width: min(660px, 90vw);
+  height: min(500px, 78vh);
+  top: 90px; left: calc(50% - 100px);
+}
+.exp-body {
+  flex: 1; overflow-y: auto;
+  padding: 1.25rem;
+  background: var(--bg2);
+}
+.tl-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+.tl-left { display: flex; flex-direction: column; align-items: center; }
+.tl-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--green2);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.tl-line { flex: 1; width: 1px; background: var(--border); margin: 4px auto 0; }
+.tl-content {}
+.tl-period { font-size: 0.68rem; color: var(--muted); font-family: var(--fm); margin-bottom: 2px; }
+.tl-role { font-size: 0.95rem; font-weight: 600; color: var(--text); font-family: var(--ff); }
+.tl-org { font-size: 0.8rem; color: var(--green); font-family: var(--ff); margin-bottom: 0.4rem; }
+.tl-desc { font-size: 0.82rem; color: #8b949e; font-family: var(--ff); line-height: 1.6; }
+
+/* ── MUN WINDOW ── */
+#mun-win {
+  width: min(680px, 90vw);
+  height: min(500px, 78vh);
+  top: 90px; left: calc(50% - 80px);
+}
+.mun-body {
+  flex: 1; overflow-y: auto;
+  padding: 1.25rem;
+  background: var(--bg2);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  align-content: start;
+}
+.mun-card {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  position: relative;
+  font-family: var(--ff);
+}
+.mun-card.award { border-color: rgba(0,255,135,0.35); }
+.mun-badge {
+  font-size: 0.62rem; font-family: var(--fm);
+  background: rgba(0,255,135,0.1);
+  color: var(--green);
+  border: 1px solid rgba(0,255,135,0.3);
+  padding: 2px 7px; border-radius: 3px;
+  display: inline-block; margin-bottom: 0.5rem;
+}
+.mun-conf { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+.mun-committee { font-size: 0.78rem; color: var(--blue); margin: 2px 0; }
+.mun-country { font-size: 0.78rem; color: var(--muted); }
+
+/* ── CONTACT WINDOW ── */
+#contact-win {
+  width: min(480px, 90vw);
+  height: min(360px, 70vh);
+  top: 110px; left: 50%;
+  transform: translateX(-50%);
+}
+.contact-body {
+  flex: 1;
+  padding: 1.5rem;
+  background: var(--bg2);
+  font-family: var(--ff);
+  overflow-y: auto;
+}
+.c-row {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.9rem 1rem;
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  transition: border-color 0.2s;
+}
+.c-row:hover { border-color: var(--green2); }
+.c-row-icon { font-size: 1.1rem; }
+.c-row-label { font-size: 0.72rem; color: var(--muted); display: block; }
+.c-row-val { font-size: 0.88rem; color: var(--text); }
+.contact-note { font-size: 0.8rem; color: var(--muted); margin-top: 1rem; line-height: 1.6; }
+
+/* ── SNAKE WINDOW ── */
+#snake-win {
+  width: 440px;
+  height: 520px;
+  top: 80px; left: calc(50% + 60px);
+}
+.snake-body {
+  flex: 1;
+  background: #080b0f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+.snake-hud {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--fm);
+}
+.snake-score-box {
+  display: flex; flex-direction: column; align-items: center;
+}
+.snake-score-label { font-size: 0.58rem; color: #3a4450; letter-spacing: 0.1em; text-transform: uppercase; }
+.snake-score-val { font-size: 1.2rem; font-weight: 700; color: var(--green); line-height: 1.2; }
+#snake-canvas {
+  border: 1px solid rgba(0,255,135,0.2);
+  border-radius: 4px;
+  display: block;
+  image-rendering: pixelated;
+}
+.snake-controls {
+  display: grid;
+  grid-template-columns: repeat(3, 36px);
+  grid-template-rows: repeat(2, 36px);
+  gap: 4px;
+}
+.s-btn {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.1s, color 0.1s;
+  font-family: var(--fm);
+  user-select: none;
+}
+.s-btn:hover, .s-btn:active { background: rgba(0,255,135,0.12); color: var(--green); border-color: rgba(0,255,135,0.3); }
+.snake-tip { font-size: 0.62rem; color: #3a4450; font-family: var(--fm); text-align: center; }
+.snake-overlay {
+  position: absolute;
+  inset: 38px 0 0 0;
+  background: rgba(8,11,15,0.88);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0.75rem;
+  font-family: var(--fm);
+  backdrop-filter: blur(2px);
+  z-index: 5;
+}
+.snake-overlay-title { font-size: 1.3rem; font-weight: 700; color: var(--green); }
+.snake-overlay-sub { font-size: 0.75rem; color: var(--muted); }
+.snake-overlay-score { font-size: 0.85rem; color: var(--yellow); }
+.snake-start-btn {
+  margin-top: 0.5rem;
+  padding: 0.55rem 1.5rem;
+  background: rgba(0,255,135,0.1);
+  border: 1px solid rgba(0,255,135,0.35);
+  border-radius: 6px;
+  color: var(--green);
+  font-family: var(--fm);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  letter-spacing: 0.05em;
+}
+.snake-start-btn:hover { background: rgba(0,255,135,0.2); }
+
+/* scrollbars */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+
+/* ── BOOT OVERLAY ── */
+#boot {
+  position: fixed; inset: 0;
+  background: #000;
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.boot-line { font-family: var(--fm); font-size: 0.78rem; color: var(--green2); opacity: 0; animation: fadein 0.3s forwards; }
+@keyframes fadein { to { opacity: 1; } }
+.boot-bar-wrap { width: 300px; height: 3px; background: #111; border-radius: 2px; margin-top: 1.5rem; overflow: hidden; }
+.boot-bar { height: 100%; width: 0; background: var(--green); border-radius: 2px; transition: width 0.1s; }
+
+/* cursor blink */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.cursor { display: inline-block; width: 7px; height: 13px; background: var(--green); animation: blink 1s step-end infinite; vertical-align: text-bottom; margin-left: 1px; }
+
+/* typewriter */
+@keyframes typing { from { width:0 } to { width:100% } }
+</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="boot">
+  <div class="boot-line" style="animation-delay:0s">[ OK ] Starting fattesing-os kernel 6.1.0...</div>
+  <div class="boot-line" style="animation-delay:0.5s">[ OK ] Loading security modules...</div>
+  <div class="boot-line" style="animation-delay:1s">[ OK ] Mounting /home/fattesing...</div>
+  <div class="boot-line" style="animation-delay:1.5s">[ OK ] Initialising network interfaces...</div>
+  <div class="boot-line" style="animation-delay:2s">[ OK ] Portfolio daemon started.</div>
+  <div class="boot-bar-wrap" style="margin-top:1.5rem"><div class="boot-bar" id="boot-bar"></div></div>
+</div>
+
+<!-- DESKTOP -->
+<div class="desktop" id="desktop">
+
+  <!-- MATRIX RAIN -->
+  <canvas id="matrix-canvas"></canvas>
+
+  <!-- TASKBAR -->
+  <div class="taskbar">
+    <span class="tb-logo">FR_OS v1.0</span>
+
+    <span class="tb-clock" id="clock">--:--</span>
+  </div>
+
+  <!-- DESKTOP ICONS -->
+  <div class="desktop-icons">
+    <div class="d-icon" ondblclick="openWin('terminal-win')">
+      <div class="d-icon-img" style="background:rgba(0,255,135,0.12)">⌨️</div>
+      <span class="d-icon-label">terminal</span>
+    </div>
+    <div class="d-icon" ondblclick="openWin('about-win')">
+      <div class="d-icon-img" style="background:rgba(88,166,255,0.12)">👤</div>
+      <span class="d-icon-label">about.me</span>
+    </div>
+    <div class="d-icon" ondblclick="openWin('skills-win')">
+      <div class="d-icon-img" style="background:rgba(240,192,64,0.12)">🛠️</div>
+      <span class="d-icon-label">skills</span>
+    </div>
+    <div class="d-icon" ondblclick="openWin('exp-win')">
+      <div class="d-icon-img" style="background:rgba(255,159,10,0.12)">📋</div>
+      <span class="d-icon-label">experience</span>
+    </div>
+    <div class="d-icon" ondblclick="openWin('mun-win')">
+      <div class="d-icon-img" style="background:rgba(0,201,106,0.12)">🌍</div>
+      <span class="d-icon-label">mun.log</span>
+    </div>
+    <div class="d-icon" ondblclick="openWin('contact-win')">
+      <div class="d-icon-img" style="background:rgba(255,95,87,0.12)">✉️</div>
+      <span class="d-icon-label">contact</span>
+    </div>
+    <div class="d-icon" ondblclick="openWin('snake-win')">
+      <div class="d-icon-img" style="background:rgba(0,255,135,0.12)">🐍</div>
+      <span class="d-icon-label">snake.exe</span>
+    </div>
+  </div>
+
+  <!-- ═══ TERMINAL WINDOW ═══ -->
+  <div class="window" id="terminal-win">
+    <div class="win-titlebar" id="terminal-win-bar">
+      <div class="win-btn win-close" onclick="closeWin('terminal-win')"></div>
+      <div class="win-btn win-min" onclick="minWin('terminal-win')"></div>
+      <div class="win-btn win-max" onclick="maxWin('terminal-win')"></div>
+      <span class="win-title">fattesing@fr-os: ~ — portfolio shell</span>
+    </div>
+
+    <div class="term-split">
+      <!-- OUTPUT PANE -->
+      <div class="term-pane">
+        <div class="term-body" id="term-output"></div>
+        <div class="term-input-row">
+          <div class="term-prompt-wrap">
+            <span class="term-prompt-user">fattesing</span>
+            <span class="term-prompt-sep">@fr-os</span>
+            <span class="term-prompt-sep">:</span>
+            <span class="term-prompt-dir">~</span>
+            <span class="term-prompt-dollar">$</span>
+          </div>
+          <input class="term-input" id="term-input" type="text" placeholder="type or click a command →" autocomplete="off" spellcheck="false" />
+          <span class="term-hint" id="term-hint"></span>
+        </div>
+      </div>
+
+      <!-- COMMAND PALETTE SIDEBAR -->
+      <div class="term-sidebar">
+        <div class="tsb-header">
+          <div class="tsb-title">Commands</div>
+          <div class="tsb-sub">click or type to run</div>
+        </div>
+        <div class="tsb-scroll">
+
+          <div class="tsb-group">
+            <div class="tsb-group-label">Navigate</div>
+            <button class="cmd-chip" onclick="runCmd('whoami')" data-cmd="whoami">
+              <span class="chip-icon">🪪</span>
+              <span class="chip-text">
+                <span class="chip-name">whoami</span>
+                <span class="chip-desc">Identity at a glance</span>
+              </span>
+            </button>
+            <button class="cmd-chip" onclick="runCmd('about')" data-cmd="about">
+              <span class="chip-icon">👤</span>
+              <span class="chip-text">
+                <span class="chip-name">about</span>
+                <span class="chip-desc">Open About window</span>
+              </span>
+            </button>
+            <button class="cmd-chip" onclick="runCmd('skills')" data-cmd="skills">
+              <span class="chip-icon">🛠</span>
+              <span class="chip-text">
+                <span class="chip-name">skills</span>
+                <span class="chip-desc">Technical arsenal</span>
+              </span>
+            </button>
+            <button class="cmd-chip" onclick="runCmd('experience')" data-cmd="experience">
+              <span class="chip-icon">📋</span>
+              <span class="chip-text">
+                <span class="chip-name">experience</span>
+                <span class="chip-desc">Work history</span>
+              </span>
+            </button>
+            <button class="cmd-chip" onclick="runCmd('mun')" data-cmd="mun">
+              <span class="chip-icon">🌍</span>
+              <span class="chip-text">
+                <span class="chip-name">mun</span>
+                <span class="chip-desc">Diplomatic record</span>
+              </span>
+            </button>
+            <button class="cmd-chip" onclick="runCmd('contact')" data-cmd="contact">
+              <span class="chip-icon">✉️</span>
+              <span class="chip-text">
+                <span class="chip-name">contact</span>
+                <span class="chip-desc">Get in touch</span>
+              </span>
+            </button>
+          </div>
+
+          <div class="tsb-group">
+            <div class="tsb-group-label">Read</div>
+            <button class="cmd-chip" onclick="runCmd('projects')" data-cmd="projects">
+              <span class="chip-icon">💻</span>
+              <span class="chip-text">
+                <span class="chip-name">projects</span>
+                <span class="chip-desc">What I've built</span>
+              </span>
+            </button>
+            <button class="cmd-chip" onclick="runCmd('education')" data-cmd="education">
+              <span class="chip-icon">🎓</span>
+              <span class="chip-text">
+                <span class="chip-name">education</span>
+                <span class="chip-desc">Academic background</span>
+              </span>
+            </button>
+            <button class="cmd-chip" onclick="runCmd('ls')" data-cmd="ls">
+              <span class="chip-icon">📂</span>
+              <span class="chip-text">
+                <span class="chip-name">ls</span>
+                <span class="chip-desc">List all sections</span>
+              </span>
+            </button>
+          </div>
+
+          <div class="tsb-group">
+            <div class="tsb-group-label">Fun</div>
+            <button class="cmd-chip" onclick="runCmd('banner')" data-cmd="banner">
+              <span class="chip-icon">🖼</span>
+              <span class="chip-text">
+                <span class="chip-name">banner</span>
+                <span class="chip-desc">Show ASCII art</span>
+              </span>
+            </button>
+            <button class="cmd-chip" onclick="runCmd('sudo hire')" data-cmd="sudo hire">
+              <span class="chip-icon">👀</span>
+              <span class="chip-text">
+                <span class="chip-name">sudo hire</span>
+                <span class="chip-desc">Easter egg 😄</span>
+              </span>
+            </button>
+            <button class="cmd-chip" onclick="runCmd('clear')" data-cmd="clear">
+              <span class="chip-icon">🗑</span>
+              <span class="chip-text">
+                <span class="chip-name">clear</span>
+                <span class="chip-desc">Clear terminal</span>
+              </span>
+            </button>
+            <button class="cmd-chip" onclick="runCmd('help')" data-cmd="help">
+              <span class="chip-icon">❓</span>
+              <span class="chip-text">
+                <span class="chip-name">help</span>
+                <span class="chip-desc">All commands</span>
+              </span>
+            </button>
+          </div>
+
+        </div>
+      </div><!-- /sidebar -->
+    </div><!-- /split -->
+  </div>
+
+  <!-- ═══ ABOUT WINDOW ═══ -->
+  <div class="window" id="about-win">
+    <div class="win-titlebar" id="about-win-bar">
+      <div class="win-btn win-close" onclick="closeWin('about-win')"></div>
+      <div class="win-btn win-min" onclick="minWin('about-win')"></div>
+      <div class="win-btn win-max" onclick="maxWin('about-win')"></div>
+      <span class="win-title">about.me — Fattesing Rane</span>
+    </div>
+    <div class="about-body">
+      <div class="about-avatar">🧑‍💻</div>
+      <div class="about-name">Fattesing Rane</div>
+      <div class="about-sub">Software Developer · Aspiring Cybersecurity Specialist · Diplomat</div>
+      <p class="about-p">B.Tech Computer Engineering student at K.J. Somaiya College of Engineering, Mumbai (2024–2028). Focused on full-stack web development with React.js, and actively building toward a career in cybersecurity and international tech policy.</p>
+      <p class="about-p">Recognised for outstanding performance at MUN conferences — awarded Best Position Paper and Honourable Mention. Currently Co-Head of Technology for Prudencia 2026, leading a team of 3 in strategic tech planning for one of Mumbai's premier MUN conferences.</p>
+      <div style="margin-top:1.25rem; display:flex; flex-direction:column; gap:0.4rem;">
+        <div class="info-row"><span>📍 Location</span> Mumbai, Maharashtra, India</div>
+        <div class="info-row"><span>🎓 College</span> KJ Somaiya College of Engineering</div>
+        <div class="info-row"><span>🎯 Goal</span> Cybersecurity + Int'l Tech Policy</div>
+        <div class="info-row"><span>🌍 Languages</span> Marathi · English · Hindi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SKILLS WINDOW ═══ -->
+  <div class="window" id="skills-win">
+    <div class="win-titlebar" id="skills-win-bar">
+      <div class="win-btn win-close" onclick="closeWin('skills-win')"></div>
+      <div class="win-btn win-min" onclick="minWin('skills-win')"></div>
+      <div class="win-btn win-max" onclick="maxWin('skills-win')"></div>
+      <span class="win-title">skills.json — Technical Arsenal</span>
+    </div>
+    <div class="skills-body">
+      <div class="sk-card">
+        <div class="sk-title">Frontend</div>
+        <div class="sk-bar-row"><div class="sk-bar-label"><span>React.js</span><span>85%</span></div><div class="sk-bar-track"><div class="sk-bar-fill" data-w="85"></div></div></div>
+        <div class="sk-bar-row"><div class="sk-bar-label"><span>HTML/CSS</span><span>90%</span></div><div class="sk-bar-track"><div class="sk-bar-fill" data-w="90"></div></div></div>
+        <div class="sk-bar-row"><div class="sk-bar-label"><span>Tailwind CSS</span><span>80%</span></div><div class="sk-bar-track"><div class="sk-bar-fill" data-w="80"></div></div></div>
+        <div class="sk-bar-row"><div class="sk-bar-label"><span>JavaScript</span><span>82%</span></div><div class="sk-bar-track"><div class="sk-bar-fill" data-w="82"></div></div></div>
+      </div>
+      <div class="sk-card">
+        <div class="sk-title">Backend &amp; DB</div>
+        <div class="sk-bar-row"><div class="sk-bar-label"><span>Node.js</span><span>75%</span></div><div class="sk-bar-track"><div class="sk-bar-fill" data-w="75"></div></div></div>
+        <div class="sk-bar-row"><div class="sk-bar-label"><span>Express.js</span><span>72%</span></div><div class="sk-bar-track"><div class="sk-bar-fill" data-w="72"></div></div></div>
+        <div class="sk-bar-row"><div class="sk-bar-label"><span>MongoDB</span><span>70%</span></div><div class="sk-bar-track"><div class="sk-bar-fill" data-w="70"></div></div></div>
+        <div class="sk-bar-row"><div class="sk-bar-label"><span>AppScript</span><span>68%</span></div><div class="sk-bar-track"><div class="sk-bar-fill" data-w="68"></div></div></div>
+      </div>
+      <div class="sk-card">
+        <div class="sk-title">Tools</div>
+        <div class="sk-tags">
+          <span class="sk-tag">Git</span><span class="sk-tag">GitHub</span><span class="sk-tag">VS Code</span><span class="sk-tag">Linux</span>
+        </div>
+      </div>
+      <div class="sk-card" style="border-color:rgba(240,192,64,0.2); position:relative; overflow:hidden;">
+        <div style="position:absolute;top:8px;right:8px;font-size:0.58rem;font-family:var(--fm);background:rgba(240,192,64,0.1);color:#f0c040;border:1px solid rgba(240,192,64,0.3);padding:2px 7px;border-radius:3px;letter-spacing:0.08em;">TRAINING</div>
+        <div class="sk-title" style="color:#f0c040;">Cybersecurity</div>
+        <div style="font-size:0.75rem;color:#7d8590;font-family:var(--ff);line-height:1.6;margin-bottom:0.75rem;">Currently exploring this field as a future specialisation. No hands-on experience yet — actively planning to start learning.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#3a4450;font-family:var(--fm);">
+            <span style="color:#f0c040">○</span> Network Security <span style="color:#3a4450;margin-left:auto">queued</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#3a4450;font-family:var(--fm);">
+            <span style="color:#f0c040">○</span> Ethical Hacking <span style="color:#3a4450;margin-left:auto">queued</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#3a4450;font-family:var(--fm);">
+            <span style="color:#f0c040">○</span> OSINT / CTF <span style="color:#3a4450;margin-left:auto">queued</span>
+          </div>
+        </div>
+        <div style="margin-top:0.75rem;font-size:0.65rem;color:#f0c040;font-family:var(--fm);">🔐 Coming soon — watch this space.</div>
+      </div>
+      <div class="sk-card" style="grid-column: span 2;">
+        <div class="sk-title">Diplomacy &amp; Leadership</div>
+        <div class="sk-tags">
+          <span class="sk-tag">Model United Nations</span><span class="sk-tag">Public Speaking</span><span class="sk-tag">Negotiation</span><span class="sk-tag">Committee Management</span><span class="sk-tag">Event Management</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ EXPERIENCE WINDOW ═══ -->
+  <div class="window" id="exp-win">
+    <div class="win-titlebar" id="exp-win-bar">
+      <div class="win-btn win-close" onclick="closeWin('exp-win')"></div>
+      <div class="win-btn win-min" onclick="minWin('exp-win')"></div>
+      <div class="win-btn win-max" onclick="maxWin('exp-win')"></div>
+      <span class="win-title">experience.log — Work History</span>
+    </div>
+    <div class="exp-body">
+      <!-- Prudencia block -->
+      <div style="margin-bottom:1.25rem;">
+        <div style="font-size:0.62rem;color:var(--green2);font-family:var(--fm);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem;padding-left:1.75rem;border-left:2px solid rgba(0,201,106,0.3);padding-top:2px;padding-bottom:2px;">Prudencia · DEC 2024 — PRESENT</div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+          <div class="tl-content">
+            <div class="tl-period">MAR 2026 — PRESENT</div>
+            <div class="tl-role">Co-Head of Technology</div>
+            <div class="tl-org">Prudencia 2026 · Mumbai</div>
+            <div class="tl-desc">Leading a team of 3, overseeing all technical operations for Prudencia MUN. Driving strategic tech planning, automation initiatives, and infrastructure decisions.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+          <div class="tl-content">
+            <div class="tl-period">JUL 2025 — APR 2026</div>
+            <div class="tl-role">Deputy Head of Technology</div>
+            <div class="tl-org">Prudencia 2026 · Mumbai</div>
+            <div class="tl-desc">Supported technology strategy and execution for the Prudencia 2026 conference edition.</div>
+          </div>
+        </div>
+        <div class="tl-item" style="margin-bottom:0;">
+          <div class="tl-left"><div class="tl-dot"></div></div>
+          <div class="tl-content">
+            <div class="tl-period">DEC 2024 — JUN 2025</div>
+            <div class="tl-role">Organising Committee — Delegate Affairs</div>
+            <div class="tl-org">Prudencia 2025 · Mumbai</div>
+            <div class="tl-desc">Managed delegate registration, on-day coordination, and real-time support. Strengthened skills in event management and multitasking under pressure.</div>
+          </div>
+        </div>
+      </div>
+      <!-- Other roles -->
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot"></div></div>
+        <div class="tl-content">
+          <div class="tl-period">NOV 2025 — PRESENT</div>
+          <div class="tl-role">Logistics Core Member</div>
+          <div class="tl-org">Somaiya Debating Society · Mumbai</div>
+          <div class="tl-desc">Handling logistics and coordination for debating events at K.J. Somaiya College.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MUN WINDOW ═══ -->
+  <div class="window" id="mun-win">
+    <div class="win-titlebar" id="mun-win-bar">
+      <div class="win-btn win-close" onclick="closeWin('mun-win')"></div>
+      <div class="win-btn win-min" onclick="minWin('mun-win')"></div>
+      <div class="win-btn win-max" onclick="maxWin('mun-win')"></div>
+      <span class="win-title">mun.log — Diplomatic Record</span>
+    </div>
+    <div class="mun-body">
+      <div class="mun-card award">
+        <div class="mun-badge">🏅 Honourable Mention</div>
+        <div class="mun-conf">Entre MUN 2025</div>
+        <div class="mun-committee">WTO — World Trade Organisation</div>
+        <div class="mun-country">Delegate of Hungary</div>
+      </div>
+      <div class="mun-card award">
+        <div class="mun-badge">🏆 Best Position Paper</div>
+        <div class="mun-conf">Wave MUN 2025</div>
+        <div class="mun-committee">SOCHUM</div>
+        <div class="mun-country">Delegate of Belarus</div>
+      </div>
+      <div class="mun-card award">
+        <div class="mun-badge">🎙️ Moderator</div>
+        <div class="mun-conf">KJSSE TECH MUN 2025</div>
+        <div class="mun-committee">DISEC — Executive Board</div>
+        <div class="mun-country">Moderator Role</div>
+      </div>
+      <div class="mun-card">
+        <div class="mun-conf">Evolve MUN 2024</div>
+        <div class="mun-committee">UNODC</div>
+        <div class="mun-country">Delegate of Armenia</div>
+      </div>
+      <div class="mun-card">
+        <div class="mun-conf">Prudencia MUN 2024</div>
+        <div class="mun-committee">DISEC</div>
+        <div class="mun-country">Delegate of Somalia</div>
+      </div>
+      <div class="mun-card">
+        <div class="mun-conf">Econ MUN 2025</div>
+        <div class="mun-committee">WTO</div>
+        <div class="mun-country">Delegate of Australia</div>
+      </div>
+      <div class="mun-card">
+        <div class="mun-conf">TCET MUN 2025</div>
+        <div class="mun-committee">UNODC × INTERPOL (Joint)</div>
+        <div class="mun-country">Delegate of Russian Federation</div>
+      </div>
+      <div class="mun-card">
+        <div class="mun-conf">Entre MUN 6th Edition</div>
+        <div class="mun-committee">World Bank Executive Board</div>
+        <div class="mun-country">Delegate of Netherlands</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CONTACT WINDOW ═══ -->
+  <div class="window" id="contact-win">
+    <div class="win-titlebar" id="contact-win-bar">
+      <div class="win-btn win-close" onclick="closeWin('contact-win')"></div>
+      <div class="win-btn win-min" onclick="minWin('contact-win')"></div>
+      <div class="win-btn win-max" onclick="maxWin('contact-win')"></div>
+      <span class="win-title">contact — Get in Touch</span>
+    </div>
+    <div class="contact-body">
+      <a href="mailto:cypher1906@gmail.com" class="c-row">
+        <span class="c-row-icon">✉️</span>
+        <div><span class="c-row-label">Email</span><span class="c-row-val">cypher1906@gmail.com</span></div>
+      </a>
+      <a href="https://www.linkedin.com/in/fattesingrane" target="_blank" class="c-row">
+        <span class="c-row-icon">💼</span>
+        <div><span class="c-row-label">LinkedIn</span><span class="c-row-val">linkedin.com/in/fattesingrane</span></div>
+      </a>
+      <a href="#" class="c-row">
+        <span class="c-row-icon">📍</span>
+        <div><span class="c-row-label">Location</span><span class="c-row-val">Mumbai, Maharashtra, India</span></div>
+      </a>
+      <p class="contact-note">Open to cybersecurity collaborations, MUN invites, tech opportunities, and interesting conversations about international relations + tech policy.</p>
+    </div>
+  </div>
+
+  <!-- ═══ SNAKE WINDOW ═══ -->
+  <div class="window" id="snake-win">
+    <div class="win-titlebar" id="snake-win-bar">
+      <div class="win-btn win-close" onclick="closeWin('snake-win'); stopSnake()"></div>
+      <div class="win-btn win-min" onclick="minWin('snake-win')"></div>
+      <div class="win-btn win-max" onclick="maxWin('snake-win')"></div>
+      <span class="win-title">snake.exe — use arrow keys or buttons</span>
+    </div>
+    <div class="snake-body">
+      <div class="snake-hud">
+        <div class="snake-score-box">
+          <span class="snake-score-label">Score</span>
+          <span class="snake-score-val" id="snake-score">0</span>
+        </div>
+        <div class="snake-score-box">
+          <span class="snake-score-label">Best</span>
+          <span class="snake-score-val" id="snake-best">0</span>
+        </div>
+        <div class="snake-score-box">
+          <span class="snake-score-label">Level</span>
+          <span class="snake-score-val" id="snake-level">1</span>
+        </div>
+      </div>
+      <canvas id="snake-canvas" width="360" height="360"></canvas>
+      <div class="snake-controls">
+        <div></div>
+        <button class="s-btn" id="s-up" onclick="snakeDir(0,-1)">▲</button>
+        <div></div>
+        <button class="s-btn" id="s-left" onclick="snakeDir(-1,0)">◀</button>
+        <button class="s-btn" onclick="togglePause()">⏸</button>
+        <button class="s-btn" id="s-right" onclick="snakeDir(1,0)">▶</button>
+      </div>
+      <div class="snake-tip">↑↓←→ keys · SPACE to pause</div>
+      <!-- overlay shown before game starts / on game over -->
+      <div class="snake-overlay" id="snake-overlay">
+        <div class="snake-overlay-title">🐍 SNAKE</div>
+        <div class="snake-overlay-sub">Eat the 🍎 · avoid the walls</div>
+        <div class="snake-overlay-score" id="snake-overlay-score" style="display:none"></div>
+        <button class="snake-start-btn" onclick="startSnake()">▶ START GAME</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /desktop -->
+
+<script>
+// ── CLOCK ──
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// ── BOOT SEQUENCE ──
+const bootBar = document.getElementById('boot-bar');
+let prog = 0;
+const bInterval = setInterval(() => {
+  prog += Math.random() * 18;
+  if (prog >= 100) { prog = 100; clearInterval(bInterval); }
+  bootBar.style.width = prog + '%';
+}, 120);
+setTimeout(() => {
+  document.getElementById('boot').style.transition = 'opacity 0.5s';
+  document.getElementById('boot').style.opacity = '0';
+  setTimeout(() => {
+    document.getElementById('boot').style.display = 'none';
+    // open terminal after boot
+    openWin('terminal-win');
+    setTimeout(() => bootTerminal(), 200);
+  }, 500);
+}, 3000);
+
+// ── WINDOW MANAGEMENT ──
+let zTop = 10;
+const minimised = {};
+const prevSize = {};
+
+function openWin(id) {
+  const w = document.getElementById(id);
+  w.classList.add('open');
+  w.style.zIndex = ++zTop;
+  w.style.display = 'flex';
+  minimised[id] = false;
+  // animate skill bars when skills window opens
+  if (id === 'skills-win') animateBars();
+}
+function closeWin(id) {
+  document.getElementById(id).classList.remove('open');
+  document.getElementById(id).style.display = 'none';
+}
+function minWin(id) {
+  const w = document.getElementById(id);
+  if (!minimised[id]) {
+    w.style.display = 'none';
+    minimised[id] = true;
+  } else {
+    w.style.display = 'flex';
+    minimised[id] = false;
+  }
+}
+function maxWin(id) {
+  const w = document.getElementById(id);
+  if (!prevSize[id]) {
+    prevSize[id] = { left: w.style.left, top: w.style.top, width: w.style.width, height: w.style.height, transform: w.style.transform };
+    w.style.left = '0'; w.style.top = '42px';
+    w.style.width = '100vw'; w.style.height = 'calc(100vh - 42px)';
+    w.style.transform = 'none'; w.style.borderRadius = '0';
+  } else {
+    Object.assign(w.style, prevSize[id]);
+    w.style.borderRadius = '10px';
+    prevSize[id] = null;
+  }
+}
+
+// ── DRAGGABLE WINDOWS ──
+document.querySelectorAll('.win-titlebar').forEach(bar => {
+  let ox, oy;
+  bar.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('win-btn')) return;
+    const win = bar.parentElement;
+    win.style.zIndex = ++zTop;
+    const rect = win.getBoundingClientRect();
+    ox = e.clientX - rect.left; oy = e.clientY - rect.top;
+    function move(e) {
+      win.style.left = (e.clientX - ox) + 'px';
+      win.style.top  = (e.clientY - oy) + 'px';
+      win.style.transform = 'none';
+    }
+    function up() {
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+    }
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+  });
+});
+
+// ── SKILL BARS ──
+function animateBars() {
+  setTimeout(() => {
+    document.querySelectorAll('.sk-bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.w + '%';
+    });
+  }, 100);
+}
+
+// ── TERMINAL ENGINE ──
+const output = document.getElementById('term-output');
+const input  = document.getElementById('term-input');
+const hint   = document.getElementById('term-hint');
+const history = [];
+let histIdx = -1;
+
+function print(text, cls = 'out') {
+  const div = document.createElement('div');
+  div.className = 'term-line ' + cls;
+  div.innerHTML = text;
+  output.appendChild(div);
+  output.scrollTop = output.scrollHeight;
+}
+function blank() { print('', 'blank'); }
+function printLines(lines, cls = 'out', delay = 0) {
+  lines.forEach((l, i) => setTimeout(() => { print(l, cls); output.scrollTop = output.scrollHeight; }, i * delay));
+  return lines.length * delay;
+}
+
+function echoCmd(cmd) {
+  const div = document.createElement('div');
+  div.className = 'term-line cmd-echo';
+  div.innerHTML = `<span class="echo-prompt">fattesing@fr-os:~$</span><span class="echo-cmd"> ${cmd}</span>`;
+  output.appendChild(div);
+  output.scrollTop = output.scrollHeight;
+}
+
+// highlight active chip
+function highlightChip(cmd) {
+  document.querySelectorAll('.cmd-chip').forEach(c => c.classList.remove('active'));
+  const chip = document.querySelector(`.cmd-chip[data-cmd="${cmd}"]`);
+  if (chip) { chip.classList.add('active'); setTimeout(() => chip.classList.remove('active'), 600); }
+}
+
+// run a command (from input or chip click)
+function runCmd(cmd) {
+  const trimmed = cmd.trim().toLowerCase();
+  input.value = '';
+  hint.textContent = '';
+  history.unshift(trimmed); histIdx = -1;
+  echoCmd(trimmed);
+  highlightChip(trimmed);
+  if (COMMANDS[trimmed]) COMMANDS[trimmed]();
+  else print(`bash: <span style="color:#ff5f57">${trimmed}</span>: command not found — try <span style="color:#f0c040">help</span>`, 'out');
+  blank();
+  input.focus();
+}
+
+const ASCII =
+`  ███████╗██████╗      ██████╗ ███████╗
+  ██╔════╝██╔══██╗    ██╔═══██╗██╔════╝
+  █████╗  ██████╔╝    ██║   ██║███████╗
+  ██╔══╝  ██╔══██╗    ██║   ██║╚════██║
+  ██║     ██║  ██║    ╚██████╔╝███████║
+  ╚═╝     ╚═╝  ╚═╝     ╚═════╝ ╚══════╝`;
+
+const COMMANDS = {
+  help: () => {
+    blank();
+    print('<span style="color:#f0c040;font-weight:700;letter-spacing:0.05em">AVAILABLE COMMANDS</span>');
+    print('<span style="color:#3a4450">─────────────────────────────────────────</span>');
+    const cmds = [
+      ['whoami',    '🪪', 'Identity snapshot'],
+      ['about',     '👤', 'Open About window'],
+      ['skills',    '🛠', 'Open Skills window'],
+      ['experience','📋', 'Open Experience window'],
+      ['mun',       '🌍', 'Open Diplomatic record'],
+      ['contact',   '✉️', 'Open Contact window'],
+      ['projects',  '💻', 'Print project highlights'],
+      ['education', '🎓', 'Print academic background'],
+      ['ls',        '📂', 'List all sections'],
+      ['banner',    '🖼', 'Show ASCII art header'],
+      ['sudo hire', '👀', 'Easter egg'],
+      ['clear',     '🗑', 'Clear the terminal'],
+    ];
+    cmds.forEach(([cmd, icon, desc]) => {
+      print(`  ${icon}  <span style="color:#00c96a;display:inline-block;width:100px">${cmd}</span><span style="color:#7d8590;font-size:0.75rem">${desc}</span>`);
+    });
+    blank();
+    print('<span style="color:#3a4450;font-size:0.72rem">Tip: use ↑↓ arrow keys for history · Tab to autocomplete · or click chips →</span>');
+    blank();
+  },
+  whoami: () => {
+    blank();
+    print('<span style="color:#00ff87;font-weight:700">╔══════════════════════════════════════╗</span>');
+    print('<span style="color:#00ff87;font-weight:700">║</span>  <span style="color:#e6edf3;font-weight:700">FATTESING RANE</span>                      <span style="color:#00ff87;font-weight:700">║</span>');
+    print('<span style="color:#00ff87;font-weight:700">╚══════════════════════════════════════╝</span>');
+    blank();
+    printLines([
+      '  <span style="color:#58a6ff">Role</span>       Fullstack Web Developer',
+      '  <span style="color:#58a6ff">Goal</span>       Aspiring Cybersecurity Specialist <span style="color:#f0c040">[training soon]</span>',
+      '  <span style="color:#58a6ff">College</span>    KJ Somaiya, Mumbai (B.Tech CSE)',
+      '  <span style="color:#58a6ff">Batch</span>      2024 – 2028',
+      '  <span style="color:#58a6ff">Email</span>      cypher1906@gmail.com',
+      '  <span style="color:#58a6ff">LinkedIn</span>   linkedin.com/in/fattesingrane',
+      '  <span style="color:#58a6ff">Location</span>   Mumbai, Maharashtra, India',
+    ], 'out', 45);
+  },
+  about:      () => { openWin('about-win');   print('<span style="color:#00c96a">→ Launching about.me …</span>'); },
+  skills:     () => { openWin('skills-win');  print('<span style="color:#00c96a">→ Launching skills.json …</span>'); },
+  experience: () => { openWin('exp-win');     print('<span style="color:#00c96a">→ Launching experience.log …</span>'); },
+  mun:        () => { openWin('mun-win');     print('<span style="color:#00c96a">→ Launching mun.log …</span>'); },
+  contact:    () => { openWin('contact-win'); print('<span style="color:#00c96a">→ Launching contact …</span>'); },
+  education: () => {
+    blank();
+    print('<span style="color:#f0c040;font-weight:700">EDUCATION</span>');
+    print('<span style="color:#3a4450">─────────────────────────────────────</span>');
+    printLines([
+      '  🎓 <span style="color:#e6edf3">B.Tech Computer Engineering</span>',
+      '     KJ Somaiya College of Engineering',
+      '     July 2024 – July 2028',
+      '',
+      '  📗 <span style="color:#e6edf3">HSC — Narayana Junior College</span>',
+      '     June 2022 – March 2024',
+      '',
+      '  📘 <span style="color:#e6edf3">CBSE — VIBGYOR Group of Schools</span>',
+      '     June 2015 – July 2022',
+    ], 'out', 40);
+  },
+  projects: () => {
+    blank();
+    print('<span style="color:#f0c040;font-weight:700">PROJECTS</span>');
+    print('<span style="color:#3a4450">─────────────────────────────────────</span>');
+    printLines([
+      '  <span style="color:#00c96a">[01]</span> <span style="color:#e6edf3">Personal Portfolio — FR_OS</span>',
+      '       HTML · CSS · JavaScript',
+      '       This very portfolio — built as an OS-style desktop experience',
+      '',
+      '  <span style="color:#00c96a">[02]</span> <span style="color:#e6edf3">Prudencia 2026 Website</span>',
+      '       React.js · Google AppScript · MongoDB',
+      '       Official website for Prudencia 2026 MUN conference',
+    ], 'out', 40);
+  },
+  ls: () => {
+    blank();
+    print('  <span style="color:#58a6ff">about/</span>  <span style="color:#58a6ff">skills/</span>  <span style="color:#58a6ff">experience/</span>  <span style="color:#58a6ff">projects/</span>  <span style="color:#58a6ff">mun/</span>  <span style="color:#58a6ff">contact/</span>  <span style="color:#58a6ff">education/</span>');
+    blank();
+  },
+  clear:  () => { output.innerHTML = ''; },
+  banner: () => showBanner(),
+  'sudo hire': () => {
+    blank();
+    printLines([
+      '<span style="color:#00ff87">[sudo] Verifying candidate: Fattesing Rane …</span>',
+      '',
+      '  Checking skills ................... <span style="color:#00c96a">✓ PASS</span>',
+      '  Checking MUN awards ............... <span style="color:#00c96a">✓ PASS</span>',
+      '  Checking leadership ............... <span style="color:#00c96a">✓ PASS</span>',
+      '  Checking cybersec trajectory ...... <span style="color:#00c96a">✓ PASS</span>',
+      '  Checking vibe ..................... <span style="color:#00c96a">✓ PASS</span>',
+      '',
+      '<span style="color:#f0c040;font-weight:700">✅ PERMISSION GRANTED — great hire detected.</span>',
+      '<span style="color:#7d8590">   → cypher1906@gmail.com</span>',
+    ], 'out', 55);
+  },
+};
+
+function showBanner() {
+  print(ASCII, 'ascii');
+  blank();
+  print('  <span style="color:#00ff87;font-weight:700;font-size:0.85rem">Fattesing Rane</span>  <span style="color:#3a4450">— Portfolio OS v1.0</span>');
+  print('  <span style="color:#7d8590;font-size:0.75rem">Software Dev · Aspiring Cybersecurity Specialist · MUN Delegate</span>');
+  blank();
+  print('  Type <span style="color:#f0c040">help</span> or <span style="color:#f0c040">click a command →</span> in the sidebar to explore.', 'out');
+  blank();
+}
+
+function bootTerminal() {
+  printLines([
+    '<span style="color:#3a4450">Initialising portfolio shell …</span>',
+    '<span style="color:#3a4450">Loading /home/fattesing …</span>',
+    '<span style="color:#00c96a">✓ All modules loaded. Welcome.</span>',
+  ], 'out', 80);
+  setTimeout(showBanner, 380);
+}
+
+// typing hint / autocomplete
+const allCmds = Object.keys(COMMANDS);
+input.addEventListener('input', () => {
+  const val = input.value.toLowerCase();
+  if (!val) { hint.textContent = ''; return; }
+  const match = allCmds.find(k => k.startsWith(val) && k !== val);
+  hint.textContent = match ? match.slice(val.length) : '';
+  // dim-highlight matching chip
+  document.querySelectorAll('.cmd-chip').forEach(c => {
+    c.style.borderColor = c.dataset.cmd.startsWith(val) ? 'rgba(0,255,135,0.2)' : '';
+  });
+});
+
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const cmd = input.value.trim();
+    if (!cmd) return;
+    input.value = ''; hint.textContent = '';
+    document.querySelectorAll('.cmd-chip').forEach(c => c.style.borderColor = '');
+    runCmd(cmd);
+  }
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const val = input.value.toLowerCase();
+    const match = allCmds.find(k => k.startsWith(val));
+    if (match) { input.value = match; hint.textContent = ''; }
+  }
+  if (e.key === 'ArrowUp') {
+    if (histIdx < history.length - 1) { histIdx++; input.value = history[histIdx]; }
+  }
+  if (e.key === 'ArrowDown') {
+    if (histIdx > 0) { histIdx--; input.value = history[histIdx]; }
+    else { histIdx = -1; input.value = ''; }
+  }
+});
+
+// focus input on terminal click
+document.getElementById('terminal-win').addEventListener('click', e => {
+  if (!e.target.closest('.cmd-chip') && !e.target.closest('.win-btn')) input.focus();
+});
+
+// ── MATRIX RAIN ──
+(function() {
+  const canvas = document.getElementById('matrix-canvas');
+  const ctx = canvas.getContext('2d');
+  const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ01フヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF<>{}[]()';
+  let cols, drops, W, H;
+
+  function resize() {
+    W = canvas.width  = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+    cols  = Math.floor(W / 18);
+    drops = Array(cols).fill(0).map(() => Math.random() * -H / 18 | 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    ctx.fillStyle = 'rgba(13,17,23,0.18)';
+    ctx.fillRect(0, 0, W, H);
+    for (let i = 0; i < cols; i++) {
+      const ch = CHARS[Math.random() * CHARS.length | 0];
+      const x  = i * 18;
+      const y  = drops[i] * 18;
+      // head char bright
+      ctx.font = '13px "JetBrains Mono", monospace';
+      ctx.fillStyle = `rgba(0,255,135,${0.7 + Math.random() * 0.3})`;
+      ctx.fillText(ch, x, y);
+      // trail
+      ctx.fillStyle = `rgba(0,180,80,${0.15 + Math.random() * 0.1})`;
+      const trailCh = CHARS[Math.random() * CHARS.length | 0];
+      ctx.fillText(trailCh, x, y - 18);
+
+      if (y > H && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw, 50);
+})();
+
+// ── SNAKE GAME ──
+const SC  = document.getElementById('snake-canvas');
+const SCX = SC.getContext('2d');
+const GRID = 18;           // px per cell
+const COLS = SC.width  / GRID;  // 20
+const ROWS = SC.height / GRID;  // 20
+
+let snake, dir, nextDir, food, score, best = 0, level, speed, loop, paused, running;
+
+function startSnake() {
+  document.getElementById('snake-overlay').style.display = 'none';
+  snake   = [{x:10, y:10},{x:9,y:10},{x:8,y:10}];
+  dir     = {x:1, y:0};
+  nextDir = {x:1, y:0};
+  score   = 0; level = 1; speed = 180;
+  paused  = false; running = true;
+  placeFood();
+  updateHUD();
+  clearInterval(loop);
+  loop = setInterval(tick, speed);
+}
+function stopSnake() { clearInterval(loop); running = false; }
+
+function placeFood() {
+  let pos;
+  do { pos = {x: Math.random()*COLS|0, y: Math.random()*ROWS|0}; }
+  while (snake.some(s => s.x===pos.x && s.y===pos.y));
+  food = pos;
+}
+
+function snakeDir(dx, dy) {
+  // prevent 180 reversal
+  if (dx !== 0 && dir.x !== 0) return;
+  if (dy !== 0 && dir.y !== 0) return;
+  nextDir = {x:dx, y:dy};
+}
+
+function togglePause() {
+  if (!running) return;
+  paused = !paused;
+  if (!paused) { clearInterval(loop); loop = setInterval(tick, speed); }
+  else          clearInterval(loop);
+}
+
+function tick() {
+  dir = {...nextDir};
+  const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+
+  // wall collision
+  if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) return gameOver();
+  // self collision
+  if (snake.some(s => s.x === head.x && s.y === head.y)) return gameOver();
+
+  snake.unshift(head);
+
+  if (head.x === food.x && head.y === food.y) {
+    score += 10 * level;
+    if (score > best) best = score;
+    // level up every 5 food
+    if (score % (50 * level) === 0) {
+      level++;
+      speed = Math.max(60, speed - 20);
+      clearInterval(loop);
+      loop = setInterval(tick, speed);
+    }
+    placeFood();
+    updateHUD();
+  } else {
+    snake.pop();
+  }
+  draw();
+}
+
+function gameOver() {
+  clearInterval(loop); running = false;
+  // flash
+  SCX.fillStyle = 'rgba(255,95,87,0.15)';
+  SCX.fillRect(0,0,SC.width,SC.height);
+  const ov = document.getElementById('snake-overlay');
+  ov.style.display = 'flex';
+  document.getElementById('snake-overlay-score').style.display = 'block';
+  document.getElementById('snake-overlay-score').textContent = `Score: ${score}  ·  Best: ${best}`;
+  document.querySelector('.snake-overlay-title').textContent = '💀 GAME OVER';
+  document.querySelector('.snake-overlay-sub').textContent = 'Better luck next time';
+  document.querySelector('.snake-start-btn').textContent = '▶ PLAY AGAIN';
+}
+
+function updateHUD() {
+  document.getElementById('snake-score').textContent = score;
+  document.getElementById('snake-best').textContent  = best;
+  document.getElementById('snake-level').textContent = level;
+}
+
+function draw() {
+  // background
+  SCX.fillStyle = '#080b0f';
+  SCX.fillRect(0,0,SC.width,SC.height);
+
+  // subtle grid
+  SCX.strokeStyle = 'rgba(0,255,135,0.04)';
+  SCX.lineWidth = 0.5;
+  for (let x=0; x<=COLS; x++) { SCX.beginPath(); SCX.moveTo(x*GRID,0); SCX.lineTo(x*GRID,SC.height); SCX.stroke(); }
+  for (let y=0; y<=ROWS; y++) { SCX.beginPath(); SCX.moveTo(0,y*GRID); SCX.lineTo(SC.width,y*GRID); SCX.stroke(); }
+
+  // food
+  SCX.font = `${GRID-2}px serif`;
+  SCX.textAlign = 'center';
+  SCX.textBaseline = 'middle';
+  SCX.fillText('🍎', food.x*GRID + GRID/2, food.y*GRID + GRID/2);
+
+  // snake
+  snake.forEach((seg, i) => {
+    const t = i / snake.length;
+    if (i === 0) {
+      SCX.fillStyle = '#00ff87';
+    } else {
+      const g = Math.round(180 - t * 120);
+      SCX.fillStyle = `rgb(0,${g},80)`;
+    }
+    const pad = i === 0 ? 1 : 2;
+    const r   = i === 0 ? 5 : 3;
+    const x   = seg.x * GRID + pad;
+    const y   = seg.y * GRID + pad;
+    const sz  = GRID - pad * 2;
+    SCX.beginPath();
+    SCX.roundRect(x, y, sz, sz, r);
+    SCX.fill();
+
+    // eyes on head
+    if (i === 0) {
+      SCX.fillStyle = '#080b0f';
+      const ex = dir.x === 0 ? [seg.x*GRID+5, seg.x*GRID+12] : dir.x > 0 ? [seg.x*GRID+12, seg.x*GRID+12] : [seg.x*GRID+5, seg.x*GRID+5];
+      const ey = dir.y === 0 ? [seg.y*GRID+5, seg.y*GRID+12] : dir.y > 0 ? [seg.y*GRID+12, seg.y*GRID+12] : [seg.y*GRID+5, seg.y*GRID+5];
+      SCX.beginPath(); SCX.arc(ex[0], ey[0], 2, 0, Math.PI*2); SCX.fill();
+      SCX.beginPath(); SCX.arc(ex[1], ey[1], 2, 0, Math.PI*2); SCX.fill();
+    }
+  });
+}
+
+// keyboard controls for snake (only when snake win is on top)
+window.addEventListener('keydown', e => {
+  const snakeWin = document.getElementById('snake-win');
+  if (!snakeWin.classList.contains('open')) return;
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
+    // only prevent default if snake window is focused/open
+    if (document.activeElement !== document.getElementById('term-input')) e.preventDefault();
+  }
+  if (!running) return;
+  const map = { ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0] };
+  if (map[e.key]) snakeDir(...map[e.key]);
+  if (e.key === ' ') togglePause();
+});
+</script>
+</body>
+</html>
