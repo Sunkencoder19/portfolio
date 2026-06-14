@@ -634,6 +634,106 @@ body {
 
 /* typewriter */
 @keyframes typing { from { width:0 } to { width:100% } }
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width: 640px) {
+
+  /* windows fill the screen */
+  .window {
+    position: fixed !important;
+    left: 0 !important; right: 0 !important;
+    top: 42px !important; bottom: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 42px) !important;
+    transform: none !important;
+    border-radius: 0 !important;
+    min-width: unset !important;
+  }
+
+  /* hide desktop icons — too cramped on mobile */
+  .desktop-icons { display: none; }
+
+  /* terminal: stack vertically — output on top, chips on bottom */
+  .term-split { flex-direction: column; }
+
+  /* sidebar becomes horizontal scrollable chip bar at bottom */
+  .term-sidebar {
+    width: 100%;
+    height: auto;
+    border-left: none;
+    border-top: 1px solid rgba(0,255,135,0.1);
+    flex-shrink: 0;
+  }
+  .tsb-header { display: none; } /* hide title — no space */
+  .tsb-scroll {
+    display: flex;
+    flex-direction: row;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tsb-scroll::-webkit-scrollbar { display: none; }
+  .tsb-group {
+    display: contents; /* flatten groups into one row */
+    margin-bottom: 0;
+  }
+  .tsb-group-label { display: none; }
+
+  /* chips become compact horizontal pills */
+  .cmd-chip {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 0.4rem 0.65rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
+    width: auto;
+    min-width: 56px;
+    border-radius: 8px;
+  }
+  .chip-icon { font-size: 1rem; width: auto; }
+  .chip-name { font-size: 0.62rem; text-align: center; white-space: nowrap; }
+  .chip-desc { display: none; } /* hide descriptions — no room */
+
+  /* terminal output — bigger font for readability */
+  .term-body {
+    font-size: 0.76rem;
+    padding: 0.75rem;
+    line-height: 1.65;
+  }
+
+  /* prompt bar compact */
+  .term-input-row { padding: 0.5rem 0.75rem; gap: 0.35rem; }
+  .term-prompt-sep:nth-child(2),  /* @fr-os */
+  .term-prompt-sep:nth-child(3),  /* : */
+  .term-prompt-dir               /* ~ */
+  { display: none; }
+  .term-prompt-user { font-size: 0.72rem; }
+  .term-prompt-dollar { font-size: 0.72rem; }
+  .term-input { font-size: 0.76rem; }
+  .term-hint { display: none; }
+
+  /* scanline covers full pane on mobile */
+  .term-pane::after { inset: 0; }
+
+  /* other windows */
+  .about-body, .exp-body, .mun-body,
+  .skills-body, .contact-body { padding: 1rem; }
+
+  .skills-body { grid-template-columns: 1fr; }
+  .mun-body    { grid-template-columns: 1fr; }
+
+  /* snake canvas scales down */
+  #snake-canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 340px;
+  }
+  .snake-body { padding: 0.75rem; gap: 0.5rem; }
+}
 </style>
 </head>
 <body>
@@ -887,22 +987,46 @@ body {
           <span class="sk-tag">Git</span><span class="sk-tag">GitHub</span><span class="sk-tag">VS Code</span><span class="sk-tag">Linux</span>
         </div>
       </div>
-      <div class="sk-card" style="border-color:rgba(240,192,64,0.2); position:relative; overflow:hidden;">
-        <div style="position:absolute;top:8px;right:8px;font-size:0.58rem;font-family:var(--fm);background:rgba(240,192,64,0.1);color:#f0c040;border:1px solid rgba(240,192,64,0.3);padding:2px 7px;border-radius:3px;letter-spacing:0.08em;">TRAINING</div>
-        <div class="sk-title" style="color:#f0c040;">Cybersecurity</div>
-        <div style="font-size:0.75rem;color:#7d8590;font-family:var(--ff);line-height:1.6;margin-bottom:0.75rem;">Currently exploring this field as a future specialisation. No hands-on experience yet — actively planning to start learning.</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#3a4450;font-family:var(--fm);">
-            <span style="color:#f0c040">○</span> Network Security <span style="color:#3a4450;margin-left:auto">queued</span>
+      <div class="sk-card" style="border-color:rgba(240,192,64,0.15);background:rgba(240,192,64,0.03);position:relative;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <div class="sk-title" style="color:#f0c040;margin-bottom:0;">🔒 Cybersecurity</div>
+          <span style="font-size:0.58rem;font-family:var(--fm);background:rgba(240,192,64,0.1);color:#f0c040;border:1px solid rgba(240,192,64,0.25);padding:2px 7px;border-radius:3px;letter-spacing:0.08em;">LOCKED</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.55rem;">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.68rem;font-family:var(--fm);color:#3a4450;margin-bottom:4px;">
+              <span>Network Security</span><span>0%</span>
+            </div>
+            <div style="height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:0%;background:linear-gradient(90deg,#f0c040,#ff9f0a);border-radius:3px;"></div>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#3a4450;font-family:var(--fm);">
-            <span style="color:#f0c040">○</span> Ethical Hacking <span style="color:#3a4450;margin-left:auto">queued</span>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.68rem;font-family:var(--fm);color:#3a4450;margin-bottom:4px;">
+              <span>Ethical Hacking</span><span>0%</span>
+            </div>
+            <div style="height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:0%;background:linear-gradient(90deg,#f0c040,#ff9f0a);border-radius:3px;"></div>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#3a4450;font-family:var(--fm);">
-            <span style="color:#f0c040">○</span> OSINT / CTF <span style="color:#3a4450;margin-left:auto">queued</span>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.68rem;font-family:var(--fm);color:#3a4450;margin-bottom:4px;">
+              <span>OSINT / CTF</span><span>0%</span>
+            </div>
+            <div style="height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:0%;background:linear-gradient(90deg,#f0c040,#ff9f0a);border-radius:3px;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.68rem;font-family:var(--fm);color:#3a4450;margin-bottom:4px;">
+              <span>Linux / Scripting</span><span>0%</span>
+            </div>
+            <div style="height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:0%;background:linear-gradient(90deg,#f0c040,#ff9f0a);border-radius:3px;"></div>
+            </div>
           </div>
         </div>
-        <div style="margin-top:0.75rem;font-size:0.65rem;color:#f0c040;font-family:var(--fm);">🔐 Coming soon — watch this space.</div>
+        <div style="margin-top:0.85rem;font-size:0.62rem;color:#f0c040;font-family:var(--fm);opacity:0.7;">⏳ Unlocks soon — training in progress</div>
       </div>
       <div class="sk-card" style="grid-column: span 2;">
         <div class="sk-title">Diplomacy &amp; Leadership</div>
@@ -1113,8 +1237,9 @@ setTimeout(() => {
   document.getElementById('boot').style.opacity = '0';
   setTimeout(() => {
     document.getElementById('boot').style.display = 'none';
-    // open terminal after boot
+    // open terminal after boot — auto-max on mobile
     openWin('terminal-win');
+    if (window.innerWidth <= 640) maxWin('terminal-win');
     setTimeout(() => bootTerminal(), 200);
   }, 500);
 }, 3000);

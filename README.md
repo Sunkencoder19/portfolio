@@ -1,155 +1,136 @@
-# Fattesing Rane — Portfolio
+# FR_OS — Fattesing Rane's Portfolio
 
-A creative, retro terminal-inspired portfolio showcasing skills, experience, and achievements in full-stack web development, diplomacy, and emerging interests in cybersecurity.
-
-## 🖥️ Overview
-
-This is an interactive portfolio website designed as a **terminal/OS simulation**. Instead of traditional static pages, visitors interact with the portfolio through a command-line interface, creating an engaging and memorable experience.
-
-**Name:** Fattesing Rane  
-**Location:** Mumbai, Maharashtra, India  
-**Current:** B.Tech Computer Engineering student at K.J. Somaiya College of Engineering (2024–2028)  
-**Focus Areas:** Full-Stack Web Development · Cybersecurity · International Tech Policy
-
-## 🎯 About
-
-I'm a software developer passionate about building web applications and exploring cybersecurity. I bring experience in:
-
-- **Web Development** — React.js frontends with Node.js backends
-- **Event Technology** — Leading tech operations for Prudencia 2026 MUN conference
-- **Diplomacy** — Multiple MUN awards and committee experience
-- **Problem-solving** — Cross-functional leadership and technical strategy
-
-Currently serving as **Co-Head of Technology** for Prudencia 2026, leading a team of 3 on strategic tech planning and automation initiatives.
-
-## 🛠️ Technical Skills
-
-### Frontend
-- **React.js** (85%) — Component-driven development
-- **HTML/CSS** (90%) — Semantic markup and responsive design
-- **Tailwind CSS** (80%) — Utility-first styling
-- **JavaScript** (82%) — ES6+ and DOM manipulation
-
-### Backend & Database
-- **Node.js** (75%) — Server-side JavaScript runtime
-- **Express.js** (72%) — RESTful API development
-- **MongoDB** (70%) — NoSQL database design
-- **Google AppScript** (68%) — Automation and scripting
-
-### Tools & Environment
-- Git & GitHub — Version control
-- VS Code — Primary development environment
-- Linux — Command-line proficiency
-
-### Diplomacy & Leadership
-- Model United Nations (MUN)
-- Public Speaking
-- Negotiation & Diplomacy
-- Committee Management
-- Event Management
-
-### Cybersecurity (In Training)
-- Network Security — *queued*
-- Ethical Hacking — *queued*
-- OSINT & CTF — *queued*
-
-## 📋 Experience
-
-### **Co-Head of Technology** — Prudencia 2026  
-*Mar 2026 – Present*  
-Leading a team of 3, overseeing all technical operations for Prudencia MUN. Driving strategic tech planning, automation initiatives, and infrastructure decisions.
-
-### **Deputy Head of Technology** — Prudencia 2026  
-*Jul 2025 – Apr 2026*  
-Supported technology strategy and execution for the Prudencia 2026 conference edition.
-
-### **Organising Committee — Delegate Affairs** — Prudencia 2025  
-*Dec 2024 – Jun 2025*  
-Managed delegate registration, on-day coordination, and real-time support. Strengthened event management and multitasking skills.
-
-### **Logistics Core Member** — Somaiya Debating Society  
-*Nov 2025 – Present*  
-Handling logistics and coordination for debating events at K.J. Somaiya College.
-
-## 🏆 MUN Achievements
-
-| Award | Conference | Committee | Role |
-|-------|-----------|-----------|------|
-| 🏅 **Honourable Mention** | Entre MUN 2025 | WTO | Hungary Delegate |
-| 🏆 **Best Position Paper** | Wave MUN 2025 | SOCHUM | Belarus Delegate |
-| 🎙️ **Moderator** | KJSSE TECH MUN 2025 | DISEC | Moderator |
-| — | Evolve MUN 2024 | UNODC | Armenia Delegate |
-
-## 🎓 Education
-
-**B.Tech Computer Engineering**  
-K.J. Somaiya College of Engineering, Mumbai  
-*2024 – 2028*
-
-## 🌍 Languages
-
-- 🇮🇳 Marathi (Native)
-- 🇬🇧 English (Fluent)
-- 🇮🇳 Hindi (Fluent)
-
-## 💻 How to Use
-
-Open `fattesing_portfolio.html` in your web browser. The portfolio is fully interactive:
-
-### Available Commands
-
-**Navigate**
-- `whoami` — Identity at a glance
-- `about` — Open About window
-- `skills` — View technical arsenal
-- `experience` — Work history
-- `mun` — Diplomatic record
-- `contact` — Get in touch
-
-**Read**
-- `projects` — What I've built
-- `education` — Academic background
-- `ls` — List all sections
-
-**Fun**
-- `banner` — Show ASCII art
-- `sudo hire` — Easter egg 😄
-- `clear` — Clear terminal
-- `help` — View all commands
-
-### Navigation Tips
-
-- Type commands directly into the terminal input field
-- Click on command chips in the right sidebar for quick access
-- Each section opens in a draggable window
-- Close, minimize, or maximize windows using the title bar buttons
-- Windows are resizable and can be positioned anywhere
-
-## 🎨 Design Inspiration
-
-The portfolio mimics a **retro 90s terminal/OS interface** with:
-- Matrix-style background animation
-- Syntax-highlighted terminal output
-- Green-on-dark cyberpunk aesthetics
-- Draggable window management system
-- Responsive design for all screen sizes
-
-## 📞 Get in Touch
-
-Interested in collaborating or have questions? Check the **contact** section in the portfolio for reach-out options.
-
-## 🔗 Quick Links
-
-- **GitHub** — [Sunkencoder19](https://github.com/Sunkencoder19)
-- **LinkedIn** — [Fattesing Rane](https://www.linkedin.com/in/fattesingrane/)
-- **Email** — cypher1906@gmail.com
-
-## 📝 Notes
-
-This portfolio was built with vanilla HTML, CSS, and JavaScript — showcasing front-end development skills without relying on heavy frameworks for the shell itself. The terminal simulation is custom-coded and fully functional.
-
-**Last Updated:** June 2026
+> A portfolio that boots like an OS, runs like a terminal, and plays like a game.
 
 ---
 
-*"Building the future, one command at a time."* 🖥️✨
+## What is this?
+
+FR_OS is a single-file interactive portfolio built as a fake desktop operating system. Instead of a traditional scrolling page, visitors land on a Linux-inspired desktop complete with a boot sequence, draggable windows, a working terminal with a command palette, a matrix rain wallpaper, and a playable Snake game.
+
+Built entirely with vanilla HTML, CSS, and JavaScript — no frameworks, no dependencies, no build step.
+
+---
+
+## Features
+
+### 🖥️ Desktop OS Experience
+- Fake Linux boot sequence with animated progress bar on load
+- Full-screen matrix rain wallpaper (katakana + hex characters) covering the entire desktop
+- Draggable, minimizable, and maximizable windows
+- Taskbar with live clock
+- Desktop icons (double-click to open windows)
+
+### ⌨️ Interactive Terminal
+- Fully working bash-style terminal with command execution
+- Split layout — output pane on the left, command palette sidebar on the right
+- Clickable command chips grouped by category (Navigate / Read / Fun)
+- Typing autocomplete hint and Tab key completion
+- Arrow key command history (↑↓)
+- Chip highlight animation when a command runs
+- Subtle scanline shimmer effect on the output pane
+
+### 📂 Portfolio Windows
+Each section of the portfolio opens as its own draggable window:
+
+| Window | Content |
+|---|---|
+| `about.me` | Bio, location, goals, languages |
+| `skills.json` | Tech skills with animated progress bars + locked cybersecurity panel |
+| `experience.log` | Timeline of roles at Prudencia & Somaiya Debating Society |
+| `mun.log` | Full MUN conference history with award badges |
+| `contact` | Email, LinkedIn, location |
+
+### 🐍 Snake Game
+- Playable Snake game in its own window (`snake.exe`)
+- 20×20 grid with subtle dot pattern
+- Gradient snake body with directional eyes
+- Levels up every 5 apples — speed increases each level
+- Score / Best / Level HUD
+- On-screen directional buttons + keyboard arrow keys
+- Space bar to pause
+- Game over screen with score and replay button
+
+### 📱 Mobile Responsive
+- All windows go fullscreen on screens ≤640px
+- Terminal sidebar collapses into a horizontal scrollable chip bar at the bottom
+- Prompt shortens to save space
+- Skills and MUN grids collapse to single column
+- Terminal auto-maximises on boot for mobile users
+
+---
+
+## Terminal Commands
+
+| Command | Description |
+|---|---|
+| `whoami` | Identity snapshot |
+| `about` | Open About window |
+| `skills` | Open Skills window |
+| `experience` | Open Experience window |
+| `mun` | Open Diplomatic Record window |
+| `contact` | Open Contact window |
+| `projects` | Print project highlights |
+| `education` | Print academic background |
+| `ls` | List all sections |
+| `banner` | Show ASCII art header |
+| `sudo hire` | 👀 Easter egg |
+| `clear` | Clear the terminal |
+| `help` | List all commands |
+
+---
+
+## Tech Stack
+
+This entire portfolio is a **single HTML file** with no external dependencies except Google Fonts.
+
+```
+fattesing_portfolio.html
+├── HTML        — structure & all window markup
+├── CSS         — OS-style theming, animations, responsive layout
+└── JavaScript  — terminal engine, window manager, matrix rain, snake game
+```
+
+**Fonts used:** JetBrains Mono (terminal), Space Grotesk (UI)
+
+---
+
+## Project Structure (Conceptual)
+
+```
+FR_OS v1.0
+├── Boot Sequence
+├── Desktop
+│   ├── Matrix Rain Canvas
+│   ├── Taskbar (logo + clock)
+│   ├── Desktop Icons
+│   └── Windows
+│       ├── Terminal (with command palette sidebar)
+│       ├── About
+│       ├── Skills
+│       ├── Experience
+│       ├── MUN Record
+│       ├── Contact
+│       └── Snake Game
+└── Mobile Layout (≤640px)
+```
+
+---
+
+## About the Developer
+
+**Fattesing Rane** — Second year B.Tech Computer Engineering student at K.J. Somaiya College of Engineering, Mumbai. Fullstack web developer, Co-Head of Technology at Prudencia 2026, and active MUN delegate with awards across multiple conferences. Aspiring cybersecurity specialist.
+
+- 📧 cypher1906@gmail.com
+- 💼 [linkedin.com/in/fattesingrane](https://www.linkedin.com/in/fattesingrane)
+- 📍 Mumbai, Maharashtra, India
+
+---
+
+## License
+
+This project is personal and not licensed for reuse or redistribution. Feel free to draw inspiration, but please build your own.
+
+---
+
+*Built with 💚 and way too much terminal nostalgia.*
