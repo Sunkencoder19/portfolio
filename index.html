@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fattesing Rane | Portfolio</title>
 <meta name="description" content="Portfolio of Fattesing Rane, a Mumbai based cybersecurity student and full-stack developer working across security tooling, web products and international tech policy.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230E1620'/%3E%3Cpath d='M16 14h24v9H26v8h12v9H26v12h-10z' fill='%23E6EAEE'/%3E%3Cpath d='M42 50l8-36h6l-8 36z' fill='%23F2401E'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230E1620'/%3E%3Cpath d='M16 14h24v9H26v8h12v9H26v12h-10z' fill='%23E6EAEE'/%3E%3Cpath d='M42 50l8-36h6l-8 36z' fill='%23F2401E'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#E6EAEE">
 <meta name="color-scheme" content="light">
 <meta property="og:title" content="Fattesing Rane | Portfolio">
@@ -106,7 +108,7 @@ main{position:relative;z-index:1}
 .nav .btn{min-height:40px;padding:.5rem 1.25rem}
 
 /* ---------- hero ---------- */
-.hero{position:relative;min-height:100dvh;display:flex;align-items:flex-end;padding:96px var(--gutter) clamp(2rem,6vh,4rem)}
+.hero{overflow-x:clip;position:relative;min-height:100dvh;display:flex;align-items:flex-end;padding:96px var(--gutter) clamp(2rem,6vh,4rem)}
 .hero-inner{position:relative;width:100%}
 .eyebrow{font-family:var(--mono);font-size:.76rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;margin-bottom:1rem}
 .hero-name{position:relative;display:grid;width:fit-content;max-width:100%;line-height:.9;letter-spacing:-.01em;font-size:clamp(3rem,min(11vw,26dvh),14rem);margin-top:.3em;--wd:100}
@@ -200,6 +202,28 @@ main{position:relative;z-index:1}
 .slashed{display:flex;flex-wrap:wrap;gap:.1em 0}
 .slashed li{white-space:nowrap}
 .slashed li:not(:last-child)::after{content:"/";color:var(--signal);font-weight:700;margin:0 .45em}
+
+/* ---------- tryhackme ---------- */
+.thm{display:block;background:var(--paper);position:relative;margin-top:clamp(2.5rem,6vh,4rem);max-width:1500px;border:1.5px solid var(--ink);padding:clamp(1.2rem,3vw,2rem);transition:background .5s var(--ease),color .5s var(--ease)}
+.thm:hover,.thm:focus-visible{background:var(--ink);color:var(--paper)}
+.thm-top{display:flex;justify-content:space-between;align-items:center;gap:1rem;font-family:var(--mono);font-size:.76rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase}
+.thm-tag{background:var(--signal);color:var(--on-signal);padding:.3rem .6rem;font-weight:700}
+.thm-go i{display:inline-block;font-style:normal;transition:transform .4s var(--ease)}
+.thm:hover .thm-go i{transform:translateX(.4em)}
+.thm-main{display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,5vw,4.5rem);align-items:end;margin-top:clamp(1.4rem,4vh,2.4rem)}
+.thm-rank{display:flex;align-items:flex-end;gap:.5rem}
+.thm-rank b{font-family:var(--display);font-weight:800;font-variation-settings:"wdth" 100;font-size:clamp(5rem,13vw,12rem);line-height:.78;color:var(--signal);font-variant-numeric:tabular-nums}
+.thm-rank em{font-style:normal;font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,6vw,5.5rem);line-height:.8;color:var(--signal)}
+.thm-rank span{font-family:var(--mono);font-size:.76rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;line-height:1.4;padding-bottom:.2rem}
+.thm-ticks{display:grid;grid-template-columns:repeat(100,1fr);gap:2px}
+.thm-ticks i{display:block;height:clamp(12px,1.6vw,20px);background:currentColor;opacity:.16;transition:opacity .25s,background .25s}
+.thm-ticks i.on{background:var(--signal);opacity:1}
+.thm-scale{display:flex;justify-content:space-between;margin-top:.6rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.thm:hover .thm-scale{color:var(--line)}
+.thm-paths{margin-top:1.1rem;font-size:1.05rem;font-weight:500}
+.foot-thm{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);border-bottom:1.5px solid var(--signal)}
+.foot-thm:hover{color:var(--signal)}
+@media (max-width:700px){.thm-main{grid-template-columns:1fr}.thm-ticks{gap:1px}}
 
 /* ---------- contact ---------- */
 .contact{position:relative;min-height:100dvh;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(6rem,18vh,11rem) var(--gutter) 2rem}
@@ -400,12 +424,25 @@ else{var l=document.getElementById('loader');if(l)l.style.display='none'}
   <section class="caps-sec" id="skills" aria-label="Skills">
     <h2 class="sec-title wd">Capabilities</h2>
     <dl class="deflist">
-      <div class="def"><dt>Security</dt><dd><ul class="slashed"><li>OWASP Top 10</li><li>SAST and Semgrep</li><li>Log analysis</li><li>Threat intelligence</li><li>Wireshark</li><li>Nmap</li></ul></dd></div>
-      <div class="def"><dt>Build</dt><dd><ul class="slashed"><li>JavaScript</li><li>Python</li><li>Bash</li><li>React.js</li><li>HTML5 and CSS3</li><li>Tailwind CSS</li><li>Node.js</li><li>Express.js</li><li>MongoDB</li><li>REST APIs</li></ul></dd></div>
-      <div class="def"><dt>Network and tools</dt><dd><ul class="slashed"><li>TCP/IP</li><li>DNS</li><li>Routing fundamentals</li><li>Git and GitHub</li><li>Linux</li><li>Postman</li></ul></dd></div>
-      <div class="def"><dt>Learning and certified</dt><dd><ul class="slashed"><li>TryHackMe Pre Security</li><li>TryHackMe Cyber Security 101</li><li>EC-Council Cloud Security Essentials</li><li>MERN Stack Bootcamp</li><li>Tailwind CSS Bootcamp</li><li>Intro to Git and GitHub</li></ul></dd></div>
-      <div class="def"><dt>Education</dt><dd class="plain"><p>B.Tech Computer Engineering at K.J. Somaiya School of Engineering, 2024-2028. CGPA 7.9 out of 10.</p><p>Languages: Marathi (native), English (full professional), Hindi (limited working).</p></dd></div>
+      <div class="def"><dt>Security</dt><dd><ul class="slashed"><li>OWASP Top 10</li><li>Vulnerability scanning</li><li>Threat intelligence enrichment</li><li>Security event monitoring</li><li>Log analysis</li><li>OSINT</li><li>Wi-Fi security</li><li>DoS and DDoS attacks</li></ul></dd></div>
+      <div class="def"><dt>Security tools</dt><dd><ul class="slashed"><li>Wireshark</li><li>Nmap</li><li>Burp Suite</li><li>OpenVAS and Greenbone</li></ul></dd></div>
+      <div class="def"><dt>Networking and systems</dt><dd><ul class="slashed"><li>TCP/IP</li><li>DNS</li><li>Routing fundamentals</li><li>Linux administration</li></ul></dd></div>
+      <div class="def"><dt>Languages and stack</dt><dd><ul class="slashed"><li>Python</li><li>Bash</li><li>JavaScript</li><li>React.js</li><li>Node.js</li><li>Express.js</li><li>MongoDB</li></ul></dd></div>
+      <div class="def"><dt>Education</dt><dd class="plain"><p>B.Tech Computer Engineering at K.J. Somaiya College of Engineering, Mumbai. CGPA 7.9 out of 10. Expected graduation August 2028.</p><p>Languages: Marathi (native), English (full professional), Hindi (limited working).</p></dd></div>
     </dl>
+    <!-- TRYHACKME -->
+    <a class="thm" id="thm" href="https://tryhackme.com/p/Sunkencoder19" target="_blank" rel="noopener" aria-label="TryHackMe profile, ranked in the top 45 percent of users">
+      <div class="thm-top"><span class="thm-tag">TryHackMe</span><span class="thm-go">View profile <i aria-hidden="true">&rarr;</i></span></div>
+      <div class="thm-main">
+        <div class="thm-rank"><span>Top</span><b data-count="45">45</b><em>%</em></div>
+        <div class="thm-side">
+          <div class="thm-ticks" aria-hidden="true"></div>
+          <div class="thm-scale" aria-hidden="true"><span>Top</span><span>All users</span></div>
+          <ul class="slashed thm-paths"><li>Pre Security</li><li>Cyber Security 101</li></ul>
+        </div>
+      </div>
+    </a>
+  
   </section>
 
   <!-- CONTACT -->
@@ -416,9 +453,10 @@ else{var l=document.getElementById('loader');if(l)l.style.display='none'}
       <div class="contact-links">
         <a class="btn btn-ghost" href="https://linkedin.com/in/fattesingrane" target="_blank" rel="noopener">LinkedIn</a>
         <a class="btn btn-ghost" href="https://github.com/Sunkencoder19" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn btn-ghost" href="https://tryhackme.com/p/Sunkencoder19" target="_blank" rel="noopener">TryHackMe</a>
       </div>
     </div>
-    <footer class="foot"><span>&copy; 2026 Fattesing Rane</span><span>Mumbai, India</span></footer>
+    <footer class="foot"><span>&copy; 2026 Fattesing Rane</span><span>Mumbai, India</span><a class="foot-thm" href="https://tryhackme.com/p/Sunkencoder19" target="_blank" rel="noopener">THM / Top 45%</a></footer>
   </section>
 </main>
 
@@ -1003,6 +1041,23 @@ if(!reduce && !isTouch){
     frame(dt); requestAnimationFrame(loop);
   }
   loop();
+})();
+
+
+/* TryHackMe rank strip: 100 ticks, first 45 light up on scroll */
+(function(){
+  var box = $('.thm-ticks'); if(!box) return;
+  for(var i=0;i<100;i++){ var t = document.createElement('i'); box.appendChild(t) }
+  var ticks = $$('i', box), num = $('.thm-rank b');
+  if(reduce){ ticks.slice(0,45).forEach(function(t){ t.classList.add('on') }); return }
+  num.textContent = '0';
+  var o = {v:0};
+  ScrollTrigger.create({trigger:'.thm', start:'top 80%', once:true, onEnter:function(){
+    gsap.to(o, {v:45, duration:1.6, ease:'power3.out', onUpdate:function(){
+      var n = Math.round(o.v); num.textContent = n;
+      ticks.forEach(function(t,i){ t.classList.toggle('on', i < n) });
+    }});
+  }});
 })();
 
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ ScrollTrigger.refresh() }) }
