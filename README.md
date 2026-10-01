@@ -1,136 +1,86 @@
-# FR_OS — Fattesing Rane's Portfolio
+# Fattesing Rane | Portfolio
 
-> A portfolio that boots like an OS, runs like a terminal, and plays like a game.
+A single-file, scroll-driven 3D portfolio for a Mumbai-based cybersecurity student and full-stack developer. Everything (HTML, CSS, JS, fonts, map data) lives in one `index.html`, so it works offline and deploys anywhere static files do.
 
----
+**Concept: "The Briefing."** The site reads like a declassified dossier. Redaction bars peel off the text as you read, a 3D globe follows the story from home base to simulated attacks to the countries where he has represented delegations, and Model UN conferences land as passport stamps. It covers three halves of the work: build (full-stack), break (red team, threat intel), govern (policy, MUN).
 
-## What is this?
+## Highlights
 
-FR_OS is a single-file interactive portfolio built as a fake desktop operating system. Instead of a traditional scrolling page, visitors land on a Linux-inspired desktop complete with a boot sequence, draggable windows, a working terminal with a command palette, a matrix rain wallpaper, and a playable Snake game.
+- **Marathi name, English on hover.** The hero shows फत्तेसिंग राणे. Hovering creates a wobbling liquid lens that reveals FATTESING RANE behind it (WebGL shader). It auto-sweeps once on load, loops on touch devices, and falls back to a hover/tap swap for reduced-motion users or browsers without WebGL.
+- **Pinned 3D globe** (Three.js) with dotted land, attack arcs and DOM country labels.
+- **Variable-width type** that stretches with scroll and cursor.
+- **TryHackMe rank card** with a scroll-triggered counter and 100-tick strip.
+- **Custom cursor** (ring and dot), Lenis smooth scroll, GSAP ScrollTrigger throughout.
+- **Accessible fallbacks:** `prefers-reduced-motion`, touch, and no-WebGL paths.
 
-Built entirely with vanilla HTML, CSS, and JavaScript — no frameworks, no dependencies, no build step.
+## Stack
 
----
+| Layer | Choice |
+| --- | --- |
+| Motion | GSAP 3.12.5 + ScrollTrigger |
+| Smooth scroll | Lenis 1.1.13 |
+| 3D | Three.js r128 |
+| Fonts | Archivo (variable width), Instrument Sans, JetBrains Mono, Noto Sans Devanagari, all embedded as base64 woff2 (SIL OFL) |
+| Map data | Natural Earth land via world-atlas (public domain), baked into a 19 KB bitmask |
 
-## Features
+All libraries are inlined, so there are no CDN calls.
 
-### 🖥️ Desktop OS Experience
-- Fake Linux boot sequence with animated progress bar on load
-- Full-screen matrix rain wallpaper (katakana + hex characters) covering the entire desktop
-- Draggable, minimizable, and maximizable windows
-- Taskbar with live clock
-- Desktop icons (double-click to open windows)
+## Design system
 
-### ⌨️ Interactive Terminal
-- Fully working bash-style terminal with command execution
-- Split layout — output pane on the left, command palette sidebar on the right
-- Clickable command chips grouped by category (Navigate / Read / Fun)
-- Typing autocomplete hint and Tab key completion
-- Arrow key command history (↑↓)
-- Chip highlight animation when a command runs
-- Subtle scanline shimmer effect on the output pane
+- **Palette:** fog `#E6EAEE`, ink `#0E1620`, muted `#586371`, line `#C5CCD4`, signal `#F2401E` (the only accent).
+- **Shape:** sharp surfaces, full-pill interactive elements.
+- **Theme:** light, locked.
 
-### 📂 Portfolio Windows
-Each section of the portfolio opens as its own draggable window:
-
-| Window | Content |
-|---|---|
-| `about.me` | Bio, location, goals, languages |
-| `skills.json` | Tech skills with animated progress bars + locked cybersecurity panel |
-| `experience.log` | Timeline of roles at Prudencia & Somaiya Debating Society |
-| `mun.log` | Full MUN conference history with award badges |
-| `contact` | Email, LinkedIn, location |
-
-### 🐍 Snake Game
-- Playable Snake game in its own window (`snake.exe`)
-- 20×20 grid with subtle dot pattern
-- Gradient snake body with directional eyes
-- Levels up every 5 apples — speed increases each level
-- Score / Best / Level HUD
-- On-screen directional buttons + keyboard arrow keys
-- Space bar to pause
-- Game over screen with score and replay button
-
-### 📱 Mobile Responsive
-- All windows go fullscreen on screens ≤640px
-- Terminal sidebar collapses into a horizontal scrollable chip bar at the bottom
-- Prompt shortens to save space
-- Skills and MUN grids collapse to single column
-- Terminal auto-maximises on boot for mobile users
-
----
-
-## Terminal Commands
-
-| Command | Description |
-|---|---|
-| `whoami` | Identity snapshot |
-| `about` | Open About window |
-| `skills` | Open Skills window |
-| `experience` | Open Experience window |
-| `mun` | Open Diplomatic Record window |
-| `contact` | Open Contact window |
-| `projects` | Print project highlights |
-| `education` | Print academic background |
-| `ls` | List all sections |
-| `banner` | Show ASCII art header |
-| `sudo hire` | 👀 Easter egg |
-| `clear` | Clear the terminal |
-| `help` | List all commands |
-
----
-
-## Tech Stack
-
-This entire portfolio is a **single HTML file** with no external dependencies except Google Fonts.
+## Repo layout
 
 ```
-fattesing_portfolio.html
-├── HTML        — structure & all window markup
-├── CSS         — OS-style theming, animations, responsive layout
-└── JavaScript  — terminal engine, window manager, matrix rain, snake game
+.
+├── index.html                  # the whole site
+├── Fattesing_Rane_Resume.pdf   # linked by the Resume buttons
+└── README.md
 ```
 
-**Fonts used:** JetBrains Mono (terminal), Space Grotesk (UI)
+The Resume buttons (hero and contact section) point to `Fattesing_Rane_Resume.pdf` in the same folder. Keep the filename, or update the two links in `index.html`.
 
----
+## Run locally
 
-## Project Structure (Conceptual)
+No build step. Open `index.html` in a browser, or serve the folder:
 
-```
-FR_OS v1.0
-├── Boot Sequence
-├── Desktop
-│   ├── Matrix Rain Canvas
-│   ├── Taskbar (logo + clock)
-│   ├── Desktop Icons
-│   └── Windows
-│       ├── Terminal (with command palette sidebar)
-│       ├── About
-│       ├── Skills
-│       ├── Experience
-│       ├── MUN Record
-│       ├── Contact
-│       └── Snake Game
-└── Mobile Layout (≤640px)
+```bash
+python3 -m http.server 8000
+# then visit http://localhost:8000
 ```
 
----
+## Deploy
 
-## About the Developer
+Any static host works.
 
-**Fattesing Rane** — Second year B.Tech Computer Engineering student at K.J. Somaiya College of Engineering, Mumbai. Fullstack web developer, Co-Head of Technology at Prudencia 2026, and active MUN delegate with awards across multiple conferences. Aspiring cybersecurity specialist.
+**GitHub Pages:** push to the repo, then Settings, Pages, deploy from the `main` branch root.
 
-- 📧 cypher1906@gmail.com
-- 💼 [linkedin.com/in/fattesingrane](https://www.linkedin.com/in/fattesingrane)
-- 📍 Mumbai, Maharashtra, India
+**Cloudflare Pages / Netlify:** connect the repo (or drag the folder in). No build command, publish directory is the repo root.
 
----
+**Custom domain:** add the domain in the host's dashboard, then create the DNS records it shows at your registrar (A/ALIAS for the root, CNAME for `www`). HTTPS is issued automatically.
 
-## License
+## Editing content
 
-This project is personal and not licensed for reuse or redistribution. Feel free to draw inspiration, but please build your own.
+Content is plain HTML inside `index.html`. Common edits:
 
----
+- **TryHackMe rank:** the `data-count="45"` value and the count-up target in the "TryHackMe rank strip" script.
+- **Skills:** the `#skills` section.
+- **Links:** contact section (`#contact`) and the TryHackMe card.
+- **Favicon:** inline SVG `<link rel="icon">` in `<head>`.
 
-*Built with 💚 and way too much terminal nostalgia.*
+The country list for the globe and the MUN stamps are also plain data in the markup and script.
+
+## Honesty note
+
+The NSMS attack arcs on the globe are drawn from the project's simulated dataset (RFC 5737 test ranges). Nothing on the page is invented data.
+
+## Contact
+
+- Email: cypher1906@gmail.com
+- LinkedIn: [linkedin.com/in/fattesingrane](https://linkedin.com/in/fattesingrane)
+- GitHub: [github.com/Sunkencoder19](https://github.com/Sunkencoder19)
+- TryHackMe: [tryhackme.com/p/Sunkencoder19](https://tryhackme.com/p/Sunkencoder19)
+
+&copy; 2026 Fattesing Rane. Fonts under SIL OFL; libraries under their own licenses.
